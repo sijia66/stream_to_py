@@ -62,9 +62,9 @@ namespace stream_to_py
 
 
                 string command = null;
+                string stream_type = null;
 
                 while (exit == false) {
-                    string stream_type = null;
 
                     //wait for BMI3D to issue command 
                     // read one frame
@@ -123,6 +123,7 @@ namespace stream_to_py
                             break;
                         case "send_rigid_bodies":
                             stream_type = "rb";
+                            if (debug) { Console.WriteLine("stream type set to {0}", stream_type); }
                             break;
                         case "send_markers":
                             stream_type = "markers";
@@ -130,7 +131,12 @@ namespace stream_to_py
                  
                         case "get":
                             //check if the string type is none
-                            if (stream_type == null): throw new System.ArgumentException("stream_type cannot be null", "original");
+                            if (stream_type == null)
+                            {
+                                Console.WriteLine(stream_type);
+                                throw new System.ArgumentException("stream_type cannot be null", "original");
+                            }
+                                
 
                             double[] frame_of_data = natStreamer.get_last_frame(stream_type, 0);
 
@@ -139,7 +145,7 @@ namespace stream_to_py
                                     Console.WriteLine(i.ToString());
                                 }
                             }
-
+              
                             //send back the value to BMI3D
                             //convert to string
                             string data_string = string.Join(",", frame_of_data);
@@ -148,6 +154,7 @@ namespace stream_to_py
                             byte_size = Encoding.ASCII.GetByteCount(data_string);
                             stream.Write(Encoding.ASCII.GetBytes(data_string), 0,byte_size);
                             break;
+
                         case "gfr": //get framerate
                             double fr = natStreamer.get_frame_rate();
                             byte_size = Encoding.ASCII.GetByteCount(fr.ToString());

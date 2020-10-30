@@ -110,10 +110,7 @@ namespace stream_to_py
 
                 //set up datalistener
                 mNatNet.OnFrameReady += new NatNetML.FrameReadyEventHandler(m_NatNet_OnFrameReady);
-
-
                 return 1;
-
             }
             else
             {
@@ -154,7 +151,11 @@ namespace stream_to_py
             
             //
             switch (track_type) {
-                default: //defailt to return first marker of the firsr marker set
+                default: 
+                    Console.WriteLine("Unrecognized track object type {0}", track_type);
+                    return null;
+
+                case "markers": //defailt to return first marker of the firsr marker set
                     NatNetML.MarkerSetData ms = data.MarkerSets[0];
                     if (object_num < ms.nMarkers)
                     {
@@ -163,8 +164,13 @@ namespace stream_to_py
                                               ms.Markers[object_num].z * m_ServerToMillimeters
                             };
                     }
-                    else
+                    else {
+                        Console.WriteLine("the specified object number( {0} ) is greater than the total markers ({1})", object_num, ms.nMarkers);
                         return null;
+                 
+                    }
+
+
 
                 case "rb":
 
@@ -202,8 +208,6 @@ namespace stream_to_py
                     else
                         return null;
             }
-
-
         }
 
 
