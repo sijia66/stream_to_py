@@ -62,7 +62,7 @@ namespace stream_to_py
 
 
                 string command = null;
-                string stream_type = null;
+                                    string stream_type = null;
 
                 while (exit == false) {
 
@@ -118,7 +118,7 @@ namespace stream_to_py
                             break;
                         case "stop":
                             Console.WriteLine("BMI3D disconnected...");
-                            natStreamer.stop_recording();
+                            natStreamer.StopRecordButton_Click();
                             exit = true;
                             break;
                         case "send_rigid_bodies":
@@ -162,7 +162,7 @@ namespace stream_to_py
   
                             break;
                         case "start_rec":
-                            natStreamer.start_recording();
+                            natStreamer.RecordButton_Click();
                             break;
                         case "set":
                             Console.WriteLine("received:" + command);

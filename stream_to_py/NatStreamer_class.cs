@@ -333,7 +333,7 @@ namespace stream_to_py
                 }
             }
         }
-        private void RecordButton_Click()
+        public void RecordButton_Click()
         {
             string command = "StartRecording";
 
@@ -353,13 +353,13 @@ namespace stream_to_py
                     OutputMessage(command + " handled but failed.");
             }
         }
-        private void StopRecordButton_Click()
+        public void StopRecordButton_Click()
         {
             string command = "StopRecording";
 
             int nBytes = 0;
             byte[] response = new byte[10000];
-            int rc = m_NatNet.SendMessageAndWait(command, out response, out nBytes);
+            int rc = mNatNet.SendMessageAndWait(command, out response, out nBytes);
 
             if (rc != 0)
             {
