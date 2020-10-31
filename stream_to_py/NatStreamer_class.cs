@@ -138,9 +138,6 @@ namespace stream_to_py
             return -1;
 
         }
-
-
-
         public double[] get_last_frame(string track_type, int object_num) {
             /*
              * when asking for data set, default to the first marker set 
@@ -209,8 +206,6 @@ namespace stream_to_py
                         return null;
             }
         }
-
-
         private static void connectToServer()
         {
             /*  [NatNet] Instantiate the client object  */
@@ -230,8 +225,6 @@ namespace stream_to_py
             connectParams.LocalAddress = mStrLocalIP;
             mNatNet.Connect(connectParams);
         }
-
-
         static bool fetchServerDescriptor()
         {
             NatNetML.ServerDescription m_ServerDescriptor = new NatNetML.ServerDescription();
@@ -250,7 +243,6 @@ namespace stream_to_py
                 return false;
             }
         }
-
         static void parseSeverDescriptor(NatNetML.ServerDescription server)
         {
             Console.WriteLine("Server Info:");
@@ -259,7 +251,6 @@ namespace stream_to_py
             Console.WriteLine("\tApplication Version: {0}.{1}.{2}.{3}", server.HostAppVersion[0], server.HostAppVersion[1], server.HostAppVersion[2], server.HostAppVersion[3]);
             Console.WriteLine("\tNatNet Version: {0}.{1}.{2}.{3}\n", server.NatNetVersion[0], server.NatNetVersion[1], server.NatNetVersion[2], server.NatNetVersion[3]);
         }
-
         static void fetchDataDescriptor()
         {
             /*  [NatNet] Fetch Data Descriptions. Instantiate objects for saving data descriptions and frame data    */
@@ -275,7 +266,6 @@ namespace stream_to_py
             }
             Console.WriteLine("\n");
         }
-
         static void parseDataDescriptor(List<NatNetML.DataDescriptor> description)
         {
             //  [NatNet] Request a description of the Active Model List from the server. 
@@ -343,7 +333,47 @@ namespace stream_to_py
                 }
             }
         }
+        private void RecordButton_Click()
+        {
+            string command = "StartRecording";
 
+            int nBytes = 0;
+            byte[] response = new byte[10000];
+            int rc = mNatNet.SendMessageAndWait(command, 3, 100, out response, out nBytes);
+            if (rc != 0)
+            {
+                OutputMessage(command + " not handled by server");
+            }
+            else
+            {
+                int opResult = System.BitConverter.ToInt32(response, 0);
+                if (opResult == 0)
+                    OutputMessage(command + " handled and succeeded.");
+                else
+                    OutputMessage(command + " handled but failed.");
+            }
+        }
+        private void StopRecordButton_Click()
+        {
+            string command = "StopRecording";
+
+            int nBytes = 0;
+            byte[] response = new byte[10000];
+            int rc = m_NatNet.SendMessageAndWait(command, out response, out nBytes);
+
+            if (rc != 0)
+            {
+                OutputMessage(command + " not handled by server");
+            }
+            else
+            {
+                int opResult = System.BitConverter.ToInt32(response, 0);
+                if (opResult == 0)
+                    OutputMessage(command + " handled and succeeded.");
+                else
+                    OutputMessage(command + " handled but failed.");
+            }
+        }
         static void fetchFrameData(NatNetML.FrameOfMocapData data, NatNetML.NatNetClientML client)
         {
 
@@ -367,7 +397,6 @@ namespace stream_to_py
                 processFrameData(data);
             }
         }
-
         public void start_thread() {
             // create and run an Update UI thread
             //UpdateUICallback d = new UpdateUICallback(UpdateUI);
@@ -375,7 +404,6 @@ namespace stream_to_py
             bmi3d_service_thread.Start();
 
         }
-
         void m_NatNet_OnFrameReady(NatNetML.FrameOfMocapData data, NatNetML.NatNetClientML client)
         {
             // measure time between frame arrival (inter frame)
@@ -402,7 +430,6 @@ namespace stream_to_py
 
             m_FramePeriodTimer.Start();
         }
-
         static void processFrameData(NatNetML.FrameOfMocapData data)
         {
             /*  Parsing Rigid Body Frame Data   */
@@ -502,8 +529,6 @@ namespace stream_to_py
             }
             Console.WriteLine("\n");
         }
-
-
         void ProcessFrameOfData(ref NatNetML.FrameOfMocapData data)
         {
 
@@ -610,8 +635,7 @@ namespace stream_to_py
             m_fLastFrameTimestamp = data.fTimestamp;
 
         }
-
-        public void start_recording() {
+        public void start_recording_to_file() {
             try
             {
                 mWriter = File.CreateText("recordingData.txt");
@@ -624,8 +648,7 @@ namespace stream_to_py
             }
 
         }
-
-        public void stop_recording() {
+        public void stop_recording_to_file() {
             if (mRecording)
             {
                 mRecording = false;
@@ -635,7 +658,6 @@ namespace stream_to_py
             }
 
         }
-
         private void WriteFrame(FrameOfMocapData data, TelemetryData telemetry)
         {
             String str = "";
@@ -668,20 +690,25 @@ namespace stream_to_py
 
             mWriter.WriteLine(str);
         }
-
         static double RadiansToDegrees(double dRads)
         {
             return dRads * (180.0f / Math.PI);
         }
-
         static int LowWord(int number)
         {
             return number & 0xFFFF;
         }
-
         static int HighWord(int number)
         {
             return ((number >> 16) & 0xFFFF);
+        }
+        private void OutputMessage(string strMessage)
+        {
+
+            if (!mApplicationRunning)
+                return;
+            Console.WriteLine(strMessage);
+
         }
 
         public class QueryPerfCounter
